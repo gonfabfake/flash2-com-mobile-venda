@@ -1,123 +1,59 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#05080f">
+<meta name="referrer" content="no-referrer">
+<meta name="mobile-web-app-capable" content="yes">
 <title>DDTank Mobile</title>
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #000000;
-  }
-  #stage {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #000000;
-  }
-  #stage object,
-  #stage embed,
-  #stage swf {
-    display: block;
-    width: 100% !important;
-    height: 100% !important;
-    border: 0;
-  }
-</style>
+
+<link rel="stylesheet" href="assets/mobile/css/mobile-controls.css">
 </head>
 <body>
-<div id="stage"></div>
-<script>
-(function () {
-  var search = window.location.search || "";
-  var qs = search.replace(/^\?/, "");
-  var params = new URLSearchParams(qs);
 
-  // qual SWF carregar (default: o loading mobile, relativo a esta pagina)
-  var swf = params.get("swf") || "DDT_Loading_Air.swf";
+<!-- ───────────────────────── área do jogo ───────────────────────── -->
+<div id="stageWrap">
+  <div id="stage" aria-label="Área do jogo"></div>
+</div>
 
-  // repassa TODOS os parametros (user, key, config, rid, ua, ...) como flashvars
-  var fv = [];
-  params.forEach(function (value, key) {
-    if (key === "swf") return;
-    fv.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
-  });
-  var flashvars = fv.join("&");
+<!-- ───────────────────────── painel tátil ───────────────────────── -->
+<!-- pointer-events:none no contêiner: o painel não bloqueia o campo de batalha -->
+<div id="touchControls" hidden></div>
 
-  var stage = document.getElementById("stage");
+<!-- ───────────────────────── telas auxiliares ───────────────────── -->
+<div id="rotateHint" hidden>Gire o aparelho para a horizontal para jogar.</div>
 
-  var obj = document.createElement("object");
-  obj.setAttribute("id", "ddtSwf");
-  obj.setAttribute("type", "application/x-shockwave-flash");
-  obj.setAttribute("data", swf);
-  obj.setAttribute("width", "100%");
-  obj.setAttribute("height", "100%");
+<div id="startGate" hidden>
+  <h1>DDTank</h1>
+  <p>Toque para iniciar em tela cheia.<br>O áudio só é liberado após o primeiro toque.</p>
+  <div class="start-cta">▶ Começar</div>
+</div>
 
-  function addParam(name, value) {
-    var p = document.createElement("param");
-    p.setAttribute("name", name);
-    p.setAttribute("value", value);
-    obj.appendChild(p);
-  }
-  addParam("movie", swf);
-  addParam("flashvars", flashvars);
-  addParam("allowScriptAccess", "always");
-  addParam("allowFullScreen", "true");
-  addParam("wmode", "direct");
-  addParam("quality", "high");
-  addParam("scale", "exactfit");
-  addParam("bgcolor", "#000000");
-  addParam("menu", "false");
+<div id="toastHost"></div>
+<div id="modalHost"></div>
+<pre id="diagPanel" hidden></pre>
 
-  var emb = document.createElement("embed");
-  emb.setAttribute("id", "ddtSwfEmbed");
-  emb.setAttribute("src", swf);
-  emb.setAttribute("type", "application/x-shockwave-flash");
-  emb.setAttribute("width", "100%");
-  emb.setAttribute("height", "100%");
-  emb.setAttribute("flashvars", flashvars);
-  emb.setAttribute("allowScriptAccess", "always");
-  emb.setAttribute("allowFullScreen", "true");
-  emb.setAttribute("wmode", "direct");
-  emb.setAttribute("quality", "high");
-  emb.setAttribute("scale", "exactfit");
-  emb.setAttribute("bgcolor", "#000000");
-  emb.setAttribute("menu", "false");
+<!-- ───────────────────────── runtime ────────────────────────────── -->
+<!--
+  NOTA DE COMPATIBILIDADE (ETAPA 5 — preservar versão PC):
+  · O `?swf=` continua aceito e tem o mesmo default de antes (DDT_Loading_Air.swf).
+  · Todos os parâmetros da URL continuam virados em flashvars, como fazia o
+    player.html original (linhas 50-56 do arquivo anterior).
+  · O teclado do desktop NÃO é interceptado em momento algum — o painel só
+    aparece quando há toque e não há cursor fino.
+-->
+<script src="vendor/ruffle/ruffle.js"></script>
+<script type="module" src="assets/mobile/js/main.js"></script>
 
-  obj.appendChild(emb);
-  stage.appendChild(obj);
+<noscript>
+  <div style="padding:24px;font:16px system-ui;color:#eaf6ff">
+    Este jogo precisa de JavaScript. Ative o JavaScript e recarregue a página.
+  </div>
+</noscript>
 
-  // em players/webviews que exigem gesto, entra em tela cheia no primeiro toque
-  function enterFullscreen() {
-    var el = document.getElementById("stage");
-    var fn = el.requestFullscreen || el.webkitRequestFullscreen ||
-             el.webkitRequestFullScreen || el.mozRequestFullScreen ||
-             el.msRequestFullscreen;
-    if (typeof fn === "function") {
-      try { fn.call(el); } catch (e) {}
-    }
-    try {
-      if (window.screen && window.screen.orientation && window.screen.orientation.lock) {
-        window.screen.orientation.lock("landscape").catch(function () {});
-      }
-    } catch (e) {}
-    document.removeEventListener("touchstart", enterFullscreen, true);
-    document.removeEventListener("click", enterFullscreen, true);
-  }
-  document.addEventListener("touchstart", enterFullscreen, true);
-  document.addEventListener("click", enterFullscreen, true);
-})();
-</script>
 </body>
 </html>

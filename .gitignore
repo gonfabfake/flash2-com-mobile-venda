@@ -3,3 +3,22 @@
 .env.*
 !.env.example
 node_modules/
+
+# ── backups e artefatos de empacotamento movidos por `auditoria` (ETAPA 2) ──
+# Nada foi excluído: os arquivos originais estão em `_backup/`, versionados no
+# histórico. Eles não devem mais ser commitados na raiz.
+_backup/
+*.bak
+*.bak_*
+*.rar
+*.zip
+!web.config
+
+# ── runtime de testes (ETAPA 7) ──
+test-results/
+playwright-report/
+.playwright/
+
+# ── decompilação (regenerável com FFDec; ver source/README.md) ──
+# Descomente para manter o fonte fora do repositório:
+# source/scripts/

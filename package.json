@@ -1,0 +1,24 @@
+{
+  "name": "ddtank-mobile-web",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Runtime web do DDTank Mobile — player Ruffle + adaptador de entrada + painel de controles para touch, com a versão desktop preservada.",
+  "type": "module",
+  "scripts": {
+    "start": "node tests/server.mjs",
+    "serve": "node tests/server.mjs",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test tests/unit",
+    "test:e2e": "node --test --test-concurrency=1 tests/e2e",
+    "test:unit:watch": "node --test --watch tests/unit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gonfabfake/flash2-com-mobile-venda.git"
+  },
+  "keywords": ["flash", "swf", "ruffle", "action-script", "ddtank", "mobile"],
+  "license": "ISC",
+  "devDependencies": {
+    "playwright": "^1.64.1"
+  }
+}

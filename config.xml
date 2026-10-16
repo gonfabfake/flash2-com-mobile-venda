@@ -12,6 +12,12 @@
         <LOGIN_PATH value="https://sitemoderno.ddns.net/" siteName="DDT" />
         <FILL_PATH value="https://sitemoderno.ddns.net/" />
         <WEEKLYSITE value="https://sitemoderno.ddns.net/cdn/image/" />
+        <!-- CORRECAO (bug B10): ConfigParaser.as:58 sobrescreve SEMPRE
+             PathInfo.STYLE_PATH com param1.STYLE_PATH.@value. Sem esta tag o
+             valor vira null e PathManager.solveStylePath() (PathManager.as:175)
+             gerava ".../cdn/nullm/<tipo>/<item>.png" -> 404 em todos os itens
+             de estilo (bone, arma, fundo). O default correto do AS3 e "style/". -->
+        <STYLE_PATH value="style/" />
         <POLICY_FILES>
             <file value="https://sitemoderno.ddns.net/cdn/crossdomain.xml" />
         </POLICY_FILES>
@@ -136,7 +142,11 @@
             <file value="flash/2.png" />
             <file value="2.png" />
         </version>
-        <version from="794" to="80">
+        <!-- CORRECAO (bug B5): "to=80" fazia LoaderSavingManager.applyUpdate()
+             sair imediatamente (applyUpdate tem `if(param2 <= param1) return;`
+             em LoaderSavingManager.as:86-89 -> 80 <= 794), entao 1.png nunca
+             era invalidado do cache e a versao final ficava presa em 794. -->
+        <version from="794" to="795">
             <file value="flash/1.png" />
             <file value="1.png" />
         </version>
