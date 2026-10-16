@@ -1,0 +1,293 @@
+package game.view.prop
+{
+   import com.pickgliss.events.FrameEvent;
+   import com.pickgliss.toplevel.StageReferance;
+   import com.pickgliss.ui.ComponentFactory;
+   import com.pickgliss.ui.controls.SimpleBitmapButton;
+   import com.pickgliss.utils.ObjectUtils;
+   import ddt.data.BagInfo;
+   import ddt.data.EquipType;
+   import ddt.data.PropInfo;
+   import ddt.data.UsePropErrorCode;
+   import ddt.data.goods.InventoryItemInfo;
+   import ddt.data.player.SelfInfo;
+   import ddt.events.BagEvent;
+   import ddt.events.FightPropEevnt;
+   import ddt.events.LivingEvent;
+   import ddt.manager.GameInSocketOut;
+   import ddt.manager.LanguageMgr;
+   import ddt.manager.MessageTipManager;
+   import ddt.manager.PlayerManager;
+   import ddt.manager.ServerConfigManager;
+   import ddt.manager.SocketManager;
+   import ddt.manager.SoundManager;
+   import entertainmentMode.view.EntertainmentAlertFrame;
+   import flash.display.DisplayObject;
+   import flash.events.KeyboardEvent;
+   import flash.events.MouseEvent;
+   import flash.geom.Point;
+   import flash.utils.Dictionary;
+   import game.model.LocalPlayer;
+   import game.view.control.FightControlBar;
+   import game.view.control.SoulState;
+   import org.aswing.KeyStroke;
+   import org.aswing.KeyboardManager;
+   import room.RoomManager;
+   import room.model.RoomInfo;
+   
+   public class CustomPropBar extends FightPropBar
+   {
+      
+      private var _selfInfo:SelfInfo;
+      
+      private var _type:int;
+      
+      private var _backStyle:String;
+      
+      private var _localVisible:Boolean = true;
+      
+      private var _randomBtn:SimpleBitmapButton = ComponentFactory.Instance.creatComponentByStylename("asset.game.custom.random");
+      
+      public function CustomPropBar(param1:LocalPlayer, param2:int)
+      {
+         this._selfInfo = param1.playerInfo as SelfInfo;
+         this._type = param2;
+         this._randomBtn.tipData = LanguageMgr.GetTranslation("ddt.entertainmentMode.cost",ServerConfigManager.instance.entertainmentPrice());
+         if(RoomManager.Instance.current.type == 41 && this._type != 1 || RoomManager.Instance.current.type == 42)
+         {
+            addChild(this._randomBtn);
+         }
+         super(param1);
+      }
+      
+      override protected function addEvent() : void
+      {
+         var _loc1_:PropCell = null;
+         this._selfInfo.FightBag.addEventListener(BagEvent.UPDATE,this.__updateProp);
+         _self.addEventListener(LivingEvent.CUSTOMENABLED_CHANGED,this.__customEnabledChanged);
+         if(Boolean(this._randomBtn))
+         {
+            this._randomBtn.addEventListener("click",this.__clickHandler);
+         }
+         for each(_loc1_ in _cells)
+         {
+            _loc1_.addEventListener(FightPropEevnt.DELETEPROP,this.__deleteProp);
+            _loc1_.addEventListener(FightPropEevnt.USEPROP,this.__useProp);
+         }
+         if(this._type == FightControlBar.LIVE)
+         {
+            _self.addEventListener(LivingEvent.ENERGY_CHANGED,__energyChange);
+         }
+         _self.addEventListener(LivingEvent.PROPENABLED_CHANGED,this.__enabledChanged);
+         KeyboardManager.getInstance().addEventListener(KeyboardEvent.KEY_DOWN,this.__keyDown);
+      }
+      
+      private function __psychicChanged(param1:LivingEvent) : void
+      {
+         if(_enabled)
+         {
+            this.updatePropByPsychic();
+         }
+      }
+      
+      private function updatePropByPsychic() : void
+      {
+         var _loc1_:PropCell = null;
+         for each(_loc1_ in _cells)
+         {
+            _loc1_.enabled = _loc1_.info != null && _self.psychic >= _loc1_.info.needPsychic;
+         }
+      }
+      
+      override protected function __enabledChanged(param1:LivingEvent) : void
+      {
+         this.enabled = _self.propEnabled && _self.customPropEnabled;
+      }
+      
+      private function __customEnabledChanged(param1:LivingEvent) : void
+      {
+         this.enabled = _self.customPropEnabled;
+      }
+      
+      private function __deleteProp(param1:FightPropEevnt) : void
+      {
+         var _loc2_:PropCell = param1.currentTarget as PropCell;
+         GameInSocketOut.sendThrowProp(_loc2_.info.Place);
+         SoundManager.instance.play("008");
+         StageReferance.stage.focus = null;
+      }
+      
+      private function __updateProp(param1:BagEvent) : void
+      {
+         var _loc2_:InventoryItemInfo = null;
+         var _loc3_:InventoryItemInfo = null;
+         var _loc4_:PropInfo = null;
+         var _loc5_:Dictionary = param1.changedSlots;
+         for each(_loc2_ in _loc5_)
+         {
+            _loc3_ = this._selfInfo.FightBag.getItemAt(_loc2_.Place);
+            if(Boolean(_loc3_))
+            {
+               _loc4_ = new PropInfo(_loc3_);
+               _loc4_.Place = _loc3_.Place;
+               _cells[_loc2_.Place].info = _loc4_;
+            }
+            else
+            {
+               _cells[_loc2_.Place].info = null;
+            }
+         }
+      }
+      
+      override protected function removeEvent() : void
+      {
+         var _loc1_:PropCell = null;
+         this._selfInfo.FightBag.removeEventListener(BagEvent.UPDATE,this.__updateProp);
+         _self.removeEventListener(LivingEvent.CUSTOMENABLED_CHANGED,this.__customEnabledChanged);
+         for each(_loc1_ in _cells)
+         {
+            _loc1_.removeEventListener(FightPropEevnt.DELETEPROP,this.__deleteProp);
+            _loc1_.removeEventListener(FightPropEevnt.USEPROP,this.__useProp);
+         }
+         if(Boolean(this._randomBtn))
+         {
+            this._randomBtn.removeEventListener("click",this.__clickHandler);
+            if(Boolean(this._randomBtn.parent))
+            {
+               this._randomBtn.parent.removeChild(this._randomBtn);
+            }
+            this._randomBtn.dispose();
+         }
+         this._randomBtn = null;
+         super.removeEvent();
+      }
+      
+      override protected function drawCells() : void
+      {
+         var _loc1_:Point = null;
+         var _loc2_:CustomPropCell = new CustomPropCell("z",_mode,this._type);
+         _loc1_ = ComponentFactory.Instance.creatCustomObject("CustomPropCellPosz");
+         _loc2_.setPossiton(_loc1_.x,_loc1_.y);
+         addChild(_loc2_);
+         var _loc3_:CustomPropCell = new CustomPropCell("x",_mode,this._type);
+         _loc1_ = ComponentFactory.Instance.creatCustomObject("CustomPropCellPosx");
+         _loc3_.setPossiton(_loc1_.x,_loc1_.y);
+         addChild(_loc3_);
+         var _loc4_:CustomPropCell = new CustomPropCell("c",_mode,this._type);
+         _loc1_ = ComponentFactory.Instance.creatCustomObject("CustomPropCellPosc");
+         _loc4_.setPossiton(_loc1_.x,_loc1_.y);
+         addChild(_loc4_);
+         _cells.push(_loc2_);
+         _cells.push(_loc3_);
+         _cells.push(_loc4_);
+         drawLayer();
+      }
+      
+      override protected function __keyDown(param1:KeyboardEvent) : void
+      {
+         switch(param1.keyCode)
+         {
+            case KeyStroke.VK_Z.getCode():
+               _cells[0].useProp();
+               break;
+            case KeyStroke.VK_X.getCode():
+               _cells[1].useProp();
+               break;
+            case KeyStroke.VK_C.getCode():
+               _cells[2].useProp();
+         }
+      }
+      
+      private function __useProp(param1:FightPropEevnt) : void
+      {
+         var _loc2_:PropInfo = null;
+         var _loc3_:String = null;
+         var _loc4_:String = null;
+         if(_enabled && this._localVisible)
+         {
+            _loc2_ = PropCell(param1.currentTarget).info;
+            _loc3_ = _self.useProp(_loc2_,2);
+            if(_loc3_ == UsePropErrorCode.Done)
+            {
+               _loc4_ = EquipType.hasPropAnimation(_loc2_.Template);
+               if(_loc4_ != null)
+               {
+                  _self.playSkillMovie(_loc4_);
+               }
+            }
+            else if(_loc3_ != UsePropErrorCode.Done && _loc3_ != UsePropErrorCode.None)
+            {
+               MessageTipManager.getInstance().show(LanguageMgr.GetTranslation("tank.game.prop." + _loc3_));
+            }
+         }
+      }
+      
+      override public function enter() : void
+      {
+         var _loc1_:InventoryItemInfo = null;
+         var _loc2_:PropInfo = null;
+         var _loc3_:BagInfo = this._selfInfo.FightBag;
+         for each(_loc1_ in _loc3_.items)
+         {
+            _loc2_ = new PropInfo(_loc1_);
+            _loc2_.Place = _loc1_.Place;
+            _cells[_loc1_.Place].info = _loc2_;
+         }
+         this.enabled = _self.customPropEnabled;
+         super.enter();
+      }
+      
+      override public function set enabled(param1:Boolean) : void
+      {
+         if(parent is SoulState && RoomManager.Instance.current.type == RoomInfo.ACTIVITY_DUNGEON_ROOM)
+         {
+            param1 = false;
+         }
+         super.enabled = param1;
+      }
+      
+      public function set backStyle(param1:String) : void
+      {
+         var _loc2_:DisplayObject = null;
+         if(this._backStyle != param1)
+         {
+            this._backStyle = param1;
+            _loc2_ = _background;
+            _background = ComponentFactory.Instance.creat(this._backStyle);
+            addChildAt(_background,0);
+            ObjectUtils.disposeObject(_loc2_);
+         }
+      }
+      
+      public function setVisible(param1:Boolean) : void
+      {
+         if(this._localVisible != param1)
+         {
+            this._localVisible = param1;
+         }
+      }
+      
+      private function __clickHandler(param1:MouseEvent) : void
+      {
+         if(ServerConfigManager.instance.entertainmentPrice() > PlayerManager.Instance.Self.Money)
+         {
+            MessageTipManager.getInstance().show(LanguageMgr.GetTranslation("ddt.entertainmentMode.notEnoughtMoney"));
+         }
+         else
+         {
+            SocketManager.Instance.out.buyEntertainment();
+         }
+      }
+      
+      private function __responseHandler(param1:FrameEvent) : void
+      {
+         (param1.target as EntertainmentAlertFrame).removeEventListener("response",this.__responseHandler);
+         (param1.target as EntertainmentAlertFrame).dispose();
+         if(param1.responseCode == 2 || param1.responseCode == 3)
+         {
+            SocketManager.Instance.out.buyEntertainment(true);
+         }
+      }
+   }
+}
+
