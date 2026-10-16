@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE cross-domain-policy SYSTEM "http://www.adobe.com/xml/dtds/cross-domain-policy.dtd">
+<cross-domain-policy>
+  <site-control permitted-cross-domain-policies="master-only" />
+  <allow-access-from domain="sitemoderno.ddns.net" secure="false" />
+  <allow-access-from domain="sitemoderno.ddns.net" secure="false" />
+  <allow-access-from domain=".sitemoderno.ddns.net/cdn" secure="false" />
+  <allow-access-from domain="api.sitemoderno.ddns.net" secure="false" />
+  <allow-access-from domain="sitemoderno.ddns.net/quest" secure="false" />
+  <allow-http-request-headers-from domain="sitemoderno.ddns.net" headers="Content-Type" secure="false" />
+  <allow-http-request-headers-from domain="sitemoderno.ddns.net" headers="Content-Type" secure="false" />
+  <allow-http-request-headers-from domain="sitemoderno.ddns.net/cdn" headers="Content-Type" secure="false" />
+  <allow-http-request-headers-from domain="sitemoderno.ddns.net/api" headers="Content-Type" secure="false" />
+  <allow-http-request-headers-from domain="sitemoderno.ddns.net/quest" headers="Content-Type" secure="false" />
+</cross-domain-policy>
