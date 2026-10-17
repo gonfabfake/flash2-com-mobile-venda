@@ -21,6 +21,8 @@ import { ExternalInterfaceAdapter } from './adapters/external-interface-adapter.
 import { MobileControls } from './mobile-controls.js';
 import { ForceMeter } from './force-meter.js';
 import { detectCapabilities, shouldShowTouchControls, Capability } from './capabilities.js';
+import { ZoomPan } from './zoom-pan.js';
+import { ZoomPan } from './zoom-pan.js';
 
 const qs = (sel) => document.querySelector(sel);
 
@@ -111,11 +113,22 @@ export async function bootstrap({ location = globalThis.location, document: doc 
     },
   });
 
+  // Zoom/pan sobre a área do jogo: torna os botões INTERNOS do SWF tocáveis.
+  const stageWrap = qs('#stageWrap');
+  const zoomPan = new ZoomPan({
+    target: stageWrap,
+    onChange: (scale) => {
+      const el = qs('#zoomIndicator');
+      if (el) { el.textContent = scale > 1.01 ? `${scale.toFixed(1)}×` : ''; el.toggleAttribute('hidden', scale <= 1.01); }
+    },
+  });
+
   const controls = showTouch && !bootError
     ? new MobileControls({
       root: qs('#touchControls'),
       input,
       forceMeter: new ForceMeter(),
+      zoomPan,
       vibrate: caps[Capability.VIBRATION] ? (ms) => navigator.vibrate(ms) : null,
       onExit: () => showExitMenu(bridge, location),
     })
@@ -153,7 +166,7 @@ export async function bootstrap({ location = globalThis.location, document: doc 
   }
 
   // Superfície para testes automatizados e diagnóstico manual.
-  globalThis.__ddt = { runtime, bridge, adapter, input, controls, caps, diag, panicRelease };
+  globalThis.__ddt = { runtime, bridge, adapter, input, controls, caps, diag, panicRelease, zoomPan };
   log('bootstrap concluído', { swf, toque: showTouch });
   return globalThis.__ddt;
 }

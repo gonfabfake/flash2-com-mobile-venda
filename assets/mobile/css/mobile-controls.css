@@ -372,6 +372,22 @@ html, body {
   pointer-events: auto;
 }
 #diagPanel[hidden] { display: none; }
+
+#zoomIndicator {
+  position: fixed;
+  top: calc(var(--mc-safe-t) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--mc-glass-strong);
+  border: 1px solid var(--mc-border);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+#zoomIndicator[hidden] { display: none; }
 .diag-line { white-space: pre-wrap; word-break: break-word; opacity: .9; }
 
 /* ───────────────────────────── responsivo ───────────────────────────────── */

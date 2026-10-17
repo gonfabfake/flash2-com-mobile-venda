@@ -51,10 +51,11 @@ export class MobileControls {
    * @param {HTMLElement} root
    * @param {{input: import('./input-core.js').InputCore, forceMeter?: ForceMeter, onExit?: Function}} opts
    */
-  constructor({ root, input, forceMeter, onExit = null, vibrate = null }) {
+  constructor({ root, input, forceMeter, zoomPan = null, onExit = null, vibrate = null }) {
     this.root = root;
     this.input = input;
     this.force = forceMeter || new ForceMeter();
+    this.zoomPan = zoomPan;
     this.onExit = onExit;
     this.vibrate = vibrate;
     this._buttons = new Map();
@@ -78,6 +79,25 @@ export class MobileControls {
 
     const actions = el('div', 'mc-top-actions', top);
     this._makeButton(actions, ACTION.TOGGLE_ARROW, 'mc-btn mc-btn--ghost', 'Mira', 'arrow');
+
+    // Zoom: torna os botões INTERNOS do SWF tocáveis em telas pequenas.
+    if (this.zoomPan) {
+      const zIn = el('button', 'mc-btn mc-btn--ghost', actions);
+      zIn.type = 'button'; zIn.title = 'Aumentar zoom'; zIn.setAttribute('aria-label', 'Zoom +');
+      zIn.textContent = '＋';
+      zIn.addEventListener('click', () => this.zoomPan.zoomIn());
+
+      const zOut = el('button', 'mc-btn mc-btn--ghost', actions);
+      zOut.type = 'button'; zOut.title = 'Diminuir zoom'; zOut.setAttribute('aria-label', 'Zoom −');
+      zOut.textContent = '−';
+      zOut.addEventListener('click', () => this.zoomPan.zoomOut());
+
+      const zReset = el('button', 'mc-btn mc-btn--ghost', actions);
+      zReset.type = 'button'; zReset.title = 'Resetar zoom'; zReset.setAttribute('aria-label', 'Resetar zoom');
+      zReset.textContent = '↺';
+      zReset.addEventListener('click', () => this.zoomPan.reset());
+    }
+
     const exit = el('button', 'mc-btn mc-btn--ghost', actions);
     exit.type = 'button';
     exit.title = 'Menu / sair';
