@@ -22,7 +22,6 @@ import { MobileControls } from './mobile-controls.js';
 import { ForceMeter } from './force-meter.js';
 import { detectCapabilities, shouldShowTouchControls, Capability } from './capabilities.js';
 import { ZoomPan } from './zoom-pan.js';
-import { ZoomPan } from './zoom-pan.js';
 
 const qs = (sel) => document.querySelector(sel);
 

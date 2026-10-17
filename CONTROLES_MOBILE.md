@@ -295,7 +295,28 @@ player original fazia.
 
 ---
 
-## 8. Acessibilidade
+## 8. Zoom e pan — tornando os botões INTERNOS do SWF tocáveis
+
+Os botões do jogo (menus, inventário, loja, guilda…) foram desenhados para
+mouse em 1000×600. No celular eles ficam ~15% menores e abaixo do mínimo de
+44 px. Sem recompilar o SWF, a solução é deixar o usuário **aumentar a área
+do jogo**:
+
+| Gesto | Efeito |
+|---|---|
+| Pinch (2 dedos) | zoom in/out, 1× … 4×, centrado no gesto |
+| 1 dedo arrastando (só quando ampliado) | pan |
+| Duplo toque | alterna 1× ↔ 2× |
+| Botões `＋`/`−`/`↺` no topo | zoom in / out / reset |
+
+**Regra de ouro:** em 1×, **nenhum evento é consumido** — o jogo recebe toque
+normalmente. O zoom só "toma" a entrada quando há 2 dedos (pinch) ou quando
+já está ampliado (pan). Isso garante que a jogabilidade normal não seja
+afetada.
+
+Implementação: `assets/mobile/js/zoom-pan.js` (6 testes unitários).
+
+## 9. Acessibilidade
 
 - Cada botão tem `aria-label` descritivo e `aria-pressed` sincronizado com o estado.
 - Botões são focáveis: `Enter`/`Espaço` pressionam e soltam corretamente
