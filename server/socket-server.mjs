@@ -65,7 +65,9 @@ export class GameSocketServer {
   }
 
   stop() {
-    for (const c of this.clients) c.destroy();
+    // this.clients guarda SESSOES {socket, ...}; é o socket que tem destroy().
+    for (const c of this.clients) { try { c.socket?.destroy(); } catch { /* noop */ } }
+    this.clients.clear();
     return new Promise((r) => (this._server ? this._server.close(r) : r()));
   }
 
