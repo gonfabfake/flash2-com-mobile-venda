@@ -22,3 +22,5 @@ playwright-report/
 # ── decompilação (regenerável com FFDec; ver source/README.md) ──
 # Descomente para manter o fonte fora do repositório:
 # source/scripts/
+# Pacote de deploy (239 MB de binarios) - gerado por script, nao versionado.
+_upload_ddtankraiz/
