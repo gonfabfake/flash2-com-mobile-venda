@@ -129,6 +129,9 @@ export async function startLocalServer({ port = 0, root = ROOT, withSocket = tru
     server, url, port: actual, gameSocket,
     close: async () => {
       await gameSocket?.stop();
+      // server.close() sozinho espera as conexoes keep-alive do fetch()
+      // terminarem e o processo nunca sai. closeAllConnections() resolve.
+      server.closeAllConnections?.();
       await new Promise((r) => server.close(r));
     },
   };
