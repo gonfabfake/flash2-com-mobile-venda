@@ -10,6 +10,7 @@
  */
 
 import http from 'node:http';
+import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import crypto from 'node:crypto';
 import path from 'node:path';
@@ -107,7 +108,7 @@ export async function startLocalServer({ port = 0, root = ROOT, withSocket = tru
       // createReadStream(path) gerencia o próprio descritor e o fecha ao
       // terminar. Usar fsp.open() sem fechar vazava um fd por requisição
       // (e mantinha o processo do Node vivo para sempre).
-      const stream = (await import('node:fs')).createReadStream(filePath);
+      const stream = fs.createReadStream(filePath);
       stream.on('error', () => { try { res.destroy(); } catch { /* noop */ } });
       res.on('close', () => stream.destroy());
       stream.pipe(res);
