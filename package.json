@@ -9,8 +9,8 @@
     "serve": "node server/local-server.mjs",
     "start:static": "node tests/server.mjs",
     "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "node --test --test-timeout=30000 \"tests/unit/**/*.test.mjs\"",
-    "test:e2e": "node --test --test-concurrency=1 --test-timeout=120000 \"tests/e2e/*.e2e.mjs\"",
+    "test:unit": "node --test --test-force-exit --test-timeout=30000 \"tests/unit/**/*.test.mjs\"",
+    "test:e2e": "node --test --test-force-exit --test-concurrency=1 --test-timeout=120000 \"tests/e2e/*.e2e.mjs\"",
     "test:unit:watch": "node --test --watch \"tests/unit/**/*.test.mjs\""
   },
   "repository": {
