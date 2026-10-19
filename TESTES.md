@@ -8,13 +8,11 @@
 
 ## 1. Resumo
 
-| Suíte | Testes | Passou | Falhou | Tempo |
-|---|---|---|---|---|
-| `tests/unit` (Node 24, `node:test`) | 49 | **49** | 0 | ~0,6 s |
-| `tests/e2e` (Chromium 1248 real) | 14 | **14** | 0 | ~5,5 min |
-| **Total** | **63** | **63** | **0** | — |
-
-> Resultado final da última execução completa: **63/63 passando** (ver §5).
+| Suíte | Testes | Passou | Falhou |
+|---|---|---|---|
+| `tests/unit` (Node 24, `node:test`) | 86 | **86** | 0 |
+| `tests/e2e` (Chromium 1248 real) | 14 | **14** | 0 |
+| **Total** | **100** | **100** | **0** |
 
 ---
 
