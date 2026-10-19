@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  config.local.xml — configuração para rodar o jogo INTEIRAMENTE a partir desta
+  pasta, sem depender do CDN remoto.
+
+  ── POR QUE ISTO EXISTE ──────────────────────────────────────────────────────
+  O loader `DDT_Loading_Air.swf` resolve o núcleo por URL ABSOLUTA:
+
+      NormalLuncher.as:130   CorePath = FLASHSITE.@value + "2.png"
+
+  Com o config.xml de produção (FLASHSITE = https://sitemoderno.ddns.net/flash/)
+  o jogo baixa o core de 4,45 MB do servidor remoto — mesmo que ele esteja
+  aqui na pasta. Em qualquer origem diferente, o navegador bloqueia por CORS:
+
+      Access to fetch at 'https://sitemoderno.ddns.net/flash/2.png?lv=795'
+      from origin 'http://127.0.0.1:xxxx' has been blocked by CORS policy
+
+  Resultado: rodando localmente, o jogo carrega o loader e PARA. A tela fica
+  preta e nenhum log chega.
+
+  ── COMO USAR ────────────────────────────────────────────────────────────────
+  Este recurso é do PRÓPRIO JOGO, não foi inventado:
+
+      DDT_Loading.as:135-142   if(loaderInfo.parameters["config"]) _configURL = ...
+
+  Basta pedir:
+
+      player.html?config=config.local.xml
+
+  ── O QUE CONTINUA DEPENDENDO DO SERVIDOR ───────────────────────────────────
+  Os endpoints de backend (ServerList.ashx, Login.ashx, quest/*.xml) NÃO existem
+  localmente e continuarão dando 404. Isso é esperado: sem servidor de jogo não
+  há login. Mas com este arquivo o core (2.png) carrega, o `StartupResourceLoader`
+  executa e a tela de login é montada — o suficiente para validar toda a camada
+  de entrada e a UI.
+
+  ── EM PRODUÇÃO, USE O config.xml NORMAL ─────────────────────────────────────
+  Este arquivo NÃO deve ser publicado no servidor de produção.
+-->
+<root>
+    <config>
+        <!-- Vazio = mesma origem e mesma pasta do loader. -->
+        <FLASHSITE value="" />
+        <BACKUP_FLASHSITE value="" />
+        <USE_MD5 value="False" />
+        <SITE value="" />
+        <RESOURCE_SITE value="" />
+        <WEEKLYSITE value="image/" />
+
+        <FIRSTPAGE value="" />
+        <REGISTER value="" />
+        <LOGIN_PATH value="" siteName="DDT" />
+        <FILL_PATH value="" />
+
+        <!-- Endpoint de dados XML/ASHX. Em dev cai no servidor local de teste. -->
+        <REQUEST_PATH value="quest/" />
+
+        <POLICY_FILES>
+            <file value="crossdomain.xml" />
+        </POLICY_FILES>
+
+        <!-- CORREÇÃO B4 (mesma do config.xml de produção): sem esta tag o
+             ConfigParaser sobrescreve PathInfo.STYLE_PATH com null e todas as
+             URLs de estilo viram ".../cdn/nullm/...". -->
+        <STYLE_PATH value="style/" />
+
+        <FIGHTLIB value="true" />
+        <ALLOW_MULTI value="false" />
+        <TRAINER_PATH value="tutorial.swf" />
+        <MUSIC_LIST value="" />
+        <LANGUAGE value="portugal" />
+        <PARTER_ID value="1001212" />
+
+        <STHRENTH_MAX value="12" />
+        <STHRENTH_ARM_MAX value="12" />
+        <STHRENTH_HEAD_MAX value="12" />
+        <STHRENTH_CLOTH_MAX value="12" />
+        <STHRENTH_OFFHAND_MAX value="12" />
+
+        <CardMax value="35" />
+        <STATISTIC value="false" />
+        <SUCIDE_TIME value="300" />
+        <GAME_BOXPIC value="1" />
+        <ISTOPDERIICT value="true" />
+        <COUNT_PATH value="" />
+
+        <!-- Tudo desligado: sem telemetria em ambiente de desenvolvimento. -->
+        <PHP isShow="false" link="false" site="" infoPath="" />
+        <OFFICIAL_SITE value="" />
+        <GAME_FORUM value="" />
+        <COMMUNITY_FRIEND_PATH isUser="false" value="" />
+        <COMMUNITY_INVITE_PATH value="" />
+        <COMMUNITY_FRIEND_LIST_PATH isUser="false" value="" snsPath="" isexist="false" isexistBtnVisble="false" />
+        <COMMUNITY_FRIEND_INVITED_SWITCH value="false" invitedOnline="false" />
+        <COMMUNITY_MICROBLOG value="false" />
+        <COMMUNITY_SINA_SECOND_MICROBLOG value="false" />
+        <ALLOW_POPUP_FAVORITE value="false" />
+        <FILL_JS_COMMAND value="" enable="false" />
+        <SHIELD_NOTICE value="false" />
+        <DAILY enable="false" />
+        <FEEDBACK enable="false" />
+        <DOWNLOAD value="false" />
+        <CROSSBUGGlLEBTN enable="false" />
+        <LOTTERY enable="false" />
+        <LUCKY_NUMBER enable="false" />
+        <TRAINER_STANDALONE value="false" />
+        <USER_GUILD_ENABLE value="false" />
+        <MINLEVELDUPLICATE value="8" />
+        <DISABLE_TASK_ID value="" />
+        <CLIENT_DOWNLOAD value="" />
+        <STATISTICS enable="false" />
+        <EXTERNAL_INTERFACE_360 value="" enable="false" />
+        <LITTLEGAMEMINLV value="20" />
+        <SHOW_BACKGROUND value="true" />
+        <FRAME_TIME_OVER_TAG value="45" />
+
+        <MODULE>
+            <WEEKLY enable="false" />
+            <CIVIL enable="false" />
+            <CHURCH enable="false" />
+        </MODULE>
+
+        <CHAT_FACE>
+            <DISABLED_LIST list="" />
+        </CHAT_FACE>
+        <GAME_FRAME_CONFIG>
+            <FRAME_OVER_COUNT_TAG value="45" />
+        </GAME_FRAME_CONFIG>
+
+        <PETS_EAT enable="false" />
+        <PETS_FARM enable="false" />
+        <PETS enable="false" />
+        <EXALT_ENABLE enable="false" />
+        <TOTEM enable="false" />
+        <ACTIVITY_LIMIT enable="false" />
+        <NECKLACE_ENABLE enable="false" />
+        <Accumulative_Login enable="false" />
+        <Invite_Friends enable="false" />
+        <World_Boss enable="false" />
+        <Open_Necklace enable="false" />
+        <FORGEBTN enable="false" />
+        <GODTEMPLE_ENABLE enable="false" />
+        <RINGSYSTEM_ENABLE enable="false" />
+        <GODSYAH enable="false" />
+        <SUIT_ENABLE enable="false" />
+        <TOTEM_ENABLE enable="false" />
+        <LATENTENRGY_ENABLE enable="false" />
+        <ADVANCE_ENABLE enable="false" />
+        <GEMSTONE_ENABLE enable="false" />
+        <PVEBUFF_ENABLE enable="false" />
+        <AVATARCOLL_ENABLE enable="false" />
+        <BATTLEPASS_ENABLE enable="false" />
+        <FARM_ENABLE enable="false" />
+        <MANUALEXPLORER_ENABLE enable="false" />
+        <PK_BTN enable="false" />
+        <ENERGY_ENABLE enable="false" />
+        <EXALTBTN enable="false" />
+    </config>
+
+    <!--
+      Mesma estrutura e mesmas versões do config.xml de produção, para que o
+      cache de recursos locais (SharedObject) invalide da mesma forma.
+      Correção B3 aplicada: o último passo vai para 795, não 80.
+    -->
+    <update>
+        <version from="787" to="788">
+            <file value="flash/DDT_Loading.swf" />
+            <file value="DDT_Loading.swf" />
+        </version>
+        <version from="788" to="789">
+            <file value="flash/ui/portugal/swf/chatball.swf" />
+            <file value="ui/portugal/swf/chatball.swf" />
+        </version>
+        <version from="789" to="790">
+            <file value="flash/ui/portugal/swf/chatball.swf" />
+            <file value="ui/portugal/swf/chatball.swf" />
+        </version>
+        <version from="790" to="791">
+            <file value="flash/ui/portugal/swf/gameover.swf" />
+            <file value="ui/portugal/swf/gameover.swf" />
+            <file value="flash/2.png" />
+            <file value="2.png" />
+        </version>
+        <version from="791" to="792">
+            <file value="sound/062.flv" />
+            <file value="sound/065.flv" />
+            <file value="sound/140.flv" />
+        </version>
+        <version from="792" to="793">
+            <file value="flash/ui/portugal/swf/forgemain.swf" />
+        </version>
+        <version from="793" to="794">
+            <file value="flash/DDT_Loading.swf" />
+            <file value="DDT_Loading.swf" />
+            <file value="flash/2.png" />
+            <file value="2.png" />
+        </version>
+        <version from="794" to="795">
+            <file value="flash/1.png" />
+            <file value="1.png" />
+        </version>
+    </update>
+</root>

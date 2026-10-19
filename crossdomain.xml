@@ -1,15 +1,31 @@
 <?xml version="1.0"?>
 <!DOCTYPE cross-domain-policy SYSTEM "http://www.adobe.com/xml/dtds/cross-domain-policy.dtd">
+<!--
+  CORRECOES aplicadas (bug B16):
+
+  1. O atributo `domain` do cross-domain-policy aceita apenas NOME DE HOST.
+     As linhas antigas usavam caminho junto do host:
+         domain=".sitemoderno.ddns.net/cdn"
+         domain="api.sitemoderno.ddns.net"
+         domain="sitemoderno.ddns.net/quest"
+     Nenhuma dessas regras era avaliada corretamente -> o acesso era negado.
+     Agora o subdominio e coberto pelo curinga "*.sitemoderno.ddns.net".
+
+  2. As regras estavam DUPLICADAS (linhas 5/6 e 10/11 eram copias literais).
+
+  3. `secure="false"` foi mantido de proposito: e o default permissivo da
+     especificacao (vale tanto para paginas http quanto https). O jogo e
+     servido em https, entao a regra continua valendo.
+
+  Este arquivo e lido por ConfigParaser.as:107-111 via
+  Security.loadPolicyFile(config.xml/POLICY_FILES/file/@value).
+-->
 <cross-domain-policy>
-  <site-control permitted-cross-domain-policies="master-only" />
-  <allow-access-from domain="sitemoderno.ddns.net" secure="false" />
-  <allow-access-from domain="sitemoderno.ddns.net" secure="false" />
-  <allow-access-from domain=".sitemoderno.ddns.net/cdn" secure="false" />
-  <allow-access-from domain="api.sitemoderno.ddns.net" secure="false" />
-  <allow-access-from domain="sitemoderno.ddns.net/quest" secure="false" />
-  <allow-http-request-headers-from domain="sitemoderno.ddns.net" headers="Content-Type" secure="false" />
-  <allow-http-request-headers-from domain="sitemoderno.ddns.net" headers="Content-Type" secure="false" />
-  <allow-http-request-headers-from domain="sitemoderno.ddns.net/cdn" headers="Content-Type" secure="false" />
-  <allow-http-request-headers-from domain="sitemoderno.ddns.net/api" headers="Content-Type" secure="false" />
-  <allow-http-request-headers-from domain="sitemoderno.ddns.net/quest" headers="Content-Type" secure="false" />
+    <site-control permitted-cross-domain-policies="master-only" />
+
+    <allow-access-from domain="sitemoderno.ddns.net" secure="false" />
+    <allow-access-from domain="*.sitemoderno.ddns.net" secure="false" />
+
+    <allow-http-request-headers-from domain="sitemoderno.ddns.net" headers="Content-Type" secure="false" />
+    <allow-http-request-headers-from domain="*.sitemoderno.ddns.net" headers="Content-Type" secure="false" />
 </cross-domain-policy>
