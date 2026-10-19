@@ -104,7 +104,13 @@ export async function startLocalServer({ port = 0, root = ROOT, withSocket = tru
         'cache-control': 'no-store',
         'access-control-allow-origin': '*',
       });
-      (await fsp.open(filePath, 'r')).createReadStream().pipe(res);
+      // createReadStream(path) gerencia o próprio descritor e o fecha ao
+      // terminar. Usar fsp.open() sem fechar vazava um fd por requisição
+      // (e mantinha o processo do Node vivo para sempre).
+      const stream = (await import('node:fs')).createReadStream(filePath);
+      stream.on('error', () => { try { res.destroy(); } catch { /* noop */ } });
+      res.on('close', () => stream.destroy());
+      stream.pipe(res);
     } catch (err) {
       res.writeHead(500).end(String(err && err.message));
     }
